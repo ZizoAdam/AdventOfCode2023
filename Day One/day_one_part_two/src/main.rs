@@ -1,5 +1,6 @@
 use phf::phf_map;
 
+// Map of the words to their numbers
 static NUMBERS: phf::Map<&'static str, u32> = phf_map! {
     "one" => 1,
     "two" => 2,
@@ -12,6 +13,7 @@ static NUMBERS: phf::Map<&'static str, u32> = phf_map! {
     "nine" => 9,
 };
 
+// Map of characters to numbers or an array of word lengths to check
 static USEFUL_CHARS: phf::Map<char, UsefulChar> = phf_map! {
     '0' => UsefulChar::Digit(0),
     '1' => UsefulChar::Digit(1),
@@ -31,8 +33,10 @@ static USEFUL_CHARS: phf::Map<char, UsefulChar> = phf_map! {
     'n' => UsefulChar::Letter(&[4]),
 };
 
+// Enum that describes the different valid states for a character worth checking
 pub enum UsefulChar {
     Digit(u32),
+    // Array of word lengths to check, I.E t could lead into two or three thus we check both 3 and 5 character lengths
     Letter(&'static [usize]),
 }
 
@@ -90,9 +94,11 @@ fn check_char(index: usize, char: char, line: &str) -> Option<u32> {
             }
             UsefulChar::Letter(word_lengths) => {
                 for word_length in word_lengths.iter() {
+                    // Check if the word is too long
                     if index + word_length > line.len() {
                         continue;
                     }
+                    // Get the word, if it has a matching number return it
                     let word = &line[index..index + word_length];
                     if let Some(number) = NUMBERS.get(word) {
                         return Some(*number);
